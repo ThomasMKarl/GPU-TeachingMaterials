@@ -1,4 +1,4 @@
-This repository contains teaching materials for the lecture "Wissenschaftliches Rechnen auf Grafikkarten" given at the University of Regensburg.
+This repository contains teaching materials for the lecture "Wissenschaftliches Rechnen auf Grafikkarten" at the University of Regensburg.
 
 Skript.pdf contains the lecture notes (still in german, english version under construction).
 

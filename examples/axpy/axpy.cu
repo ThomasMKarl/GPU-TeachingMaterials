@@ -3,7 +3,7 @@
 //download gnuplot: http://ftp.cstug.cz/pub/CTAN/graphics/gnuplot/5.2.6/
 
 /*
-nvcc haxpy.cu -arch=compute_61 -code=sm_61 -O3 -std=c++14 -Xcompiler "-O3 -Wall -Wextra -std=c++14" -o axpy
+nvcc axpy.cu -arch=compute_61 -code=sm_61 -O3 -std=c++14 -Xcompiler "-O3 -Wall -Wextra -std=c++14" -o axpy
 ./axpy > axpy.plot
 gnuplot
 	load "axpy.gnuplot"

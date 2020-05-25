@@ -1,4 +1,13 @@
 /* measuring the performance of haxpy, saxpy and daxpy */
+
+//download gnuplot: http://ftp.cstug.cz/pub/CTAN/graphics/gnuplot/5.2.6/
+
+/*
+nvcc haxpy.cu -arch=compute_61 -code=sm_61 -O3 -std=c++14 -Xcompiler "-O3 -Wall -Wextra -std=c++14" -o axpy
+./axpy > axpy.plot
+gnuplot
+	load "axpy.gnuplot"
+*/
 #include <stdio.h>
 #include <cuda_fp16.h>
 #include "fp16_conversion.h"
@@ -68,9 +77,9 @@ int main()
   cudaEventCreate(&stop);
   float milliseconds;
   
-  for(uint n = 12800; n < 128000000; n += 12800)
+  printf("#size half single double\n");
+  for(uint n = 12800; n < 12800000; n += 128000)
   {
-    
   nBlocks = (n + blockSize - 1) / blockSize;
   
   ////////////////// half /////////////////////
@@ -78,7 +87,7 @@ int main()
   {
   half a = approx_float_to_half(2.0f);
 
-  half *h_x = malloc(n * sizeof(half));
+  half *h_x = (half*)malloc(n * sizeof(half));
   half *h_y = (half*)malloc(n * sizeof(half));
   
   for (uint i = 0; i < n; i++)

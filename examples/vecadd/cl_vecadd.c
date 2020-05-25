@@ -1,5 +1,5 @@
 /* OpenCL host code example for the addition of two vectors */
-//compile: g++ -O3 -std=c++14 -Wall cl_vecadd.c -lOpenCL -lgpuerror_ocl -DDEBUG_OCL
+//compile: g++ -Wall -Wextra -std=c++14 cl_vecadd.c -lOpenCL ../libgpuerror_ocl.a -DDEBUG_OCL -o vecadd
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
@@ -18,8 +18,8 @@ int main(void)
   cl_uint size = 2560; //Größe der Vektoren
 
   //Allozieren von Hostspeicher
-  cl_float* h_x = (float *)malloc(size*sizeof(cl_float));
-  cl_float* h_y = (float *)malloc(size*sizeof(cl_float));
+  cl_float* h_x   = (float *)malloc(size*sizeof(cl_float));
+  cl_float* h_y   = (float *)malloc(size*sizeof(cl_float));
   cl_float* h_res = (float *)malloc(size*sizeof(cl_float));
   for(cl_uint i = 0; i < size; ++i)
   {

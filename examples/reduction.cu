@@ -131,7 +131,7 @@ int main()
   cudaMemcpy(d, hOut, size, cudaMemcpyHostToDevice);
   //note - size of the data is the blocksize
 
-  PR_v5<<<blocks, threads, smSize>>>(d);  
+  PR_v1<<<blocks, threads, smSize>>>(d);  
 
   uint toDo = 0;
   if (blocks>1) toDo = 1 + blocks/maxThreads;

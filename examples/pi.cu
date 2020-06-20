@@ -48,7 +48,7 @@ struct estimate_pi :
   }
 };
 
-int main(void)
+int main()
 {
   // use 30K independent seeds
   int M = 30000;

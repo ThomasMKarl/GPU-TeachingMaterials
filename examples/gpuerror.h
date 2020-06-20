@@ -9,8 +9,8 @@
 #include<cuda.h>
 #include<cuda_runtime.h>
 
-#define CUDA_CALL(x) do { if((x)!=cudaSuccess) {	              \
-    printf("'%s' at %s:%d\n",cudaGetErrorString(),__FILE__,__LINE__); \
+#define CUDA_CALL(x) do { cudaError_t err = x; if(err!=cudaSuccess) { \
+    printf("'%s' at %s:%d\n",cudaGetErrorString(x),__FILE__,__LINE__); \
     return EXIT_FAILURE;}} while(0)
 
 #define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) {	\

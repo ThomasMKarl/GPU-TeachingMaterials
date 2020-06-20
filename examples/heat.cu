@@ -32,6 +32,13 @@ int main()
 
   //jacobi(u, n, m, 1000, 0.0001);
   cuda_jacobi(u, n, m, 200, 0.0001);
+  
+  for(uint k = 0; k < n*m; ++k)
+  {
+	i = k%n; j = k/n;
+	if(i == n) printf("\n");
+  	printf("%f ", u[i*n + j]);
+  }
 
   free(u);
 
@@ -109,7 +116,7 @@ void cuda_jacobi(float *u, uint n, uint m, uint steps, float eps)
   float err = eps;
   while(err >= eps && iter < steps)
   {
-    printf("##############\niteration %d\n##############\n", iter);
+    //printf("##############\niteration %d\n##############\n", iter);
 
     jacobi_kernel<<<blocks, threads>>>(d_u, thrust::raw_pointer_cast(error.data()), n, m, steps, eps);
 

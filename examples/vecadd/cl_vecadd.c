@@ -1,26 +1,56 @@
 /* OpenCL host code example for the addition of two vectors */
-//compile: g++ -Wall -Wextra -std=c++14 cl_vecadd.c -lOpenCL ../libgpuerror_ocl.a -DDEBUG_OCL -o vecadd
+//compile: gcc -O3 -Wall -Wextra -std=c11 cl_vecadd.c -lOpenCL ../libgpuerror_ocl.a -DDEBUG_OCL -o vecadd
+//clang -emit-llvm cl_vecadd.cl -o cl_vecadd.bc -c -S -Xclang -finclude-default-header
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
 
-//#pragma OPENCL EXTENSION cl_khr_spir : enable
-
 #include "../gpuerror.h"
+
+int oclReadFile(char *path, char *source_str, size_t *source_size) 
+{
+  FILE *fp;
+  fp = fopen(path, "r");
+  if(!fp)
+  {
+    fprintf(stderr, "Failed to load the File %s. Check permissions.\n", path);
+    return EXIT_FAILURE;
+  }
+  
+  fseek(fp, 0, SEEK_END);
+  size_t s = ftell(fp);
+  fseek(fp, 0, SEEK_SET); 
+  source_str = (char*)malloc(s);
+   
+  *source_size = fread(source_str, 1, s, fp);
+  printf("%s", source_str);
+  
+  fclose(fp);
+  
+  return EXIT_SUCCESS;
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 
-int main(void)
+int main(int argc, char **argv)
 {
+  if(argc != 3)
+  {
+  	printf("usage: %s <platformID> <deviceID>", argv[0]);
+  	return -1;
+  }
+  int p = atoi(argv[1]);
+  int d = atoi(argv[2]);
+
   int ret;
   
   //cl_... für genormte Datentypen
   cl_uint size = 2560; //Größe der Vektoren
 
   //Allozieren von Hostspeicher
-  cl_float* h_x   = (float *)malloc(size*sizeof(cl_float));
-  cl_float* h_y   = (float *)malloc(size*sizeof(cl_float));
-  cl_float* h_res = (float *)malloc(size*sizeof(cl_float));
+  cl_float* h_x   = (cl_float *)malloc(size*sizeof(cl_float));
+  cl_float* h_y   = (cl_float *)malloc(size*sizeof(cl_float));
+  cl_float* h_res = (cl_float *)malloc(size*sizeof(cl_float));
   for(cl_uint i = 0; i < size; ++i)
   {
     h_x[i] = 1.0f;
@@ -30,33 +60,60 @@ int main(void)
   ///////////////////////////////////////////////////////////////////
 
   //Einlesen der Kerneldatei als string
-  char *source_str = NULL;
+  char *source_str;
   size_t source_size = 0;
-  char filename[] = "cl_vecadd.cl";
-  ret = oclReadFile(filename, source_str, &source_size);
-  //ret = oclReadFile("cl_vecadd.spirv", source_str, &source_size);
+  char path[] = "cl_vecadd.cl";
+  FILE *fp;
+  fp = fopen(path, "r");
+  if(!fp)
+  {
+    fprintf(stderr, "Failed to load the File %s. Check permissions.\n", path);
+    return EXIT_FAILURE;
+  }
+  
+  fseek(fp, 0, SEEK_END);
+  size_t s = ftell(fp);
+  fseek(fp, 0, SEEK_SET); 
+  source_str = (char*)malloc(s);
+   
+  source_size = fread(source_str, 1, s, fp);
+  
+  fclose(fp);
+
+  //ret = oclReadFile("cl_vecadd.spir", source_str, &source_size);
   
   ///////////////////////////////////////////////////////////////////
 
   //Zuordnung der Platformen
   //platform_id kann ein array von mehreren ids sein
-  cl_platform_id platform_id = NULL;
   cl_uint ret_num_platforms;
-  OCL_CALL(clGetPlatformIDs(1, &platform_id, &ret_num_platforms));
+  OCL_CALL(clGetPlatformIDs(0, NULL, &ret_num_platforms));
+  
+  cl_platform_id *platform_ids = (cl_platform_id *)malloc(ret_num_platforms*sizeof(cl_platform_id));
+  OCL_CALL(clGetPlatformIDs(ret_num_platforms, platform_ids, NULL));
   
   //Zuordnung der Devices einer Platform
   //device_id kann ein array von mehreren ids sein
-  cl_device_id device_id = NULL;
   cl_uint ret_num_devices;
-  OCL_CALL(clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_GPU, 1, &device_id, &ret_num_devices));
+  OCL_CALL(clGetDeviceIDs(platform_ids[p], CL_DEVICE_TYPE_ALL, 0, NULL, &ret_num_devices));
+  
+  cl_device_id *device_ids = (cl_device_id *)malloc(ret_num_devices*sizeof(cl_device_id));
+  OCL_CALL(clGetDeviceIDs(platform_ids[p], CL_DEVICE_TYPE_ALL, ret_num_devices, device_ids, NULL));
+  cl_device_id device_id = device_ids[d];
+  
+  char param[128] = {0};
+  size_t size_post = 0;
+  OCL_CALL(clGetDeviceInfo(device_id, CL_DEVICE_NAME, 128, param, &size_post));
+  printf("My name is: %s\n", param);
 
   cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret); OCL_CALL(ret);
   
   //ordnet context und device ine eine Warteschlange ein
   
   //clCreateCommandQueueWithProperties ab Version 2.0
-  const cl_command_queue_properties properties = CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE;
-  cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, &properties, &ret); OCL_CALL(ret);
+  //const cl_command_queue_properties properties = CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE;
+  //cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, &properties, &ret); OCL_CALL(ret);
+  cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, NULL, &ret); OCL_CALL(ret);
 
   //Allozieren von Devicespeicher und Zuordnen zum context
   //constant Memory kann so alloziert werden
@@ -74,12 +131,13 @@ int main(void)
 
   //Kompilieren einer oder mehrerer OCL Dateien (.cl) zur Laufzeit
   cl_program program = clCreateProgramWithSource(context, 1, (const char **)&source_str, (const size_t *)&source_size, &ret); OCL_CALL(ret);
+
   //evtl. für Parameter (include, define) für den OCL compiler
   OCL_CALL(clBuildProgram(program, 1, &device_id, "-cl-std=CL1.2 -cl-single-precision-constant -w", NULL, NULL));
-  //oclKernelTest(ret, program, device_id);
+  oclKernelTest(ret, program, device_id);
   
   //cl_program program = clCreateProgramWithBinary(context, 1, &device_id, (const size_t *)&source_size, (const unsigned char **)&source_str, NULL, &ret); OCL_CALL(ret);
-  //OCL_CALL(clBuildProgram(program, 1, &device_id, "-cl-std=CL1.2 -cl-single-precision-constant -w -x spir -spir-std=v1.5", NULL, NULL));
+  //OCL_CALL(clBuildProgram(program, 1, &device_id, "-cl-std=CL1.2 -cl-single-precision-constant -w", NULL, NULL));
   //oclKernelTest(ret, program, device_id);
   
 
@@ -91,10 +149,11 @@ int main(void)
   ////////////////////////////////////////////////////////////////////////////////////////////
 
   //Setzen der Kernelargumente, buffer oder Variablen
-  OCL_CALL(clSetKernelArg(kernel_vecadd, 0, sizeof(cl_mem),  (void *)&d_x));
-  OCL_CALL(clSetKernelArg(kernel_vecadd, 1, sizeof(cl_mem),  (void *)&d_y));
-  OCL_CALL(clSetKernelArg(kernel_vecadd, 2, sizeof(cl_mem),  (void *)&d_res));
-  OCL_CALL(clSetKernelArg(kernel_vecadd, 3, sizeof(cl_uint), &size));
+  size_t narg = 0;
+  OCL_CALL(clSetKernelArg(kernel_vecadd, narg++, sizeof(cl_mem),  (void *)&d_x));
+  OCL_CALL(clSetKernelArg(kernel_vecadd, narg++, sizeof(cl_mem),  (void *)&d_y));
+  OCL_CALL(clSetKernelArg(kernel_vecadd, narg++, sizeof(cl_mem),  (void *)&d_res));
+  OCL_CALL(clSetKernelArg(kernel_vecadd, narg++, sizeof(cl_uint), &size));
 
   //Einreihen des Kernels in Warteschlange und Zuordnung zu einem Event
   cl_event vecadd_event;

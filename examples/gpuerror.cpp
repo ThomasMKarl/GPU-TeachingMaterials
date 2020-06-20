@@ -318,7 +318,7 @@ int oclKernelTest(int error, cl_program program, cl_device_id device_id)
   int oclKernelTest(int error, cl_program program, cl_device_id device_id){return 0;} 
 #endif
 
-int oclReadFile(char *path, char *source_str, size_t *source_size) 
+/*int oclReadFile(char *path, char *source_str, size_t *source_size) 
 {
   FILE *fp;
   fp = fopen(path, "r");
@@ -338,4 +338,4 @@ int oclReadFile(char *path, char *source_str, size_t *source_size)
   fclose(fp);
   
   return EXIT_SUCCESS;
-}
+  }*/

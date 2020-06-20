@@ -12,15 +12,21 @@
 #include <fstream>
 #include <sstream>
 
-
-int main()
+int main(int argc, char *argv[])
 {
-  //muss size_t sein
-  size_t global_item_size = 2560; //Zahl der Workitems gesamt
-  size_t local_item_size = 128; //Größe der Workgroup
+  if(argc != 3)
+  {
+  	printf("usage: %s <platformID> <deviceID>", argv[0]);
+  	return -1;
+  }
+  int p = atoi(argv[1]);
+  int d = atoi(argv[2]);
 
   //cl_... für genormte Datentypen
   cl_uint size = 2560; //Größe der Vektoren
+  //muss size_t sein
+  size_t local_item_size = 256; //Größe der Workgroup
+  size_t global_item_size = ((size+local_item_size-1)/local_item_size)*local_item_size; //Zahl der Workitems gesamt
 
   ///////////////////////////////////////////////////////////////////
 
@@ -31,8 +37,13 @@ int main()
 
   /////////
   //Allozieren von Hostspeicher
-  cl_float* h_x   = (float *)malloc(size*sizeof(cl_float));
-  cl_float* h_y   = (float *)malloc(size*sizeof(cl_float));
+  std::vector<cl_float> h_x(size*sizeof(cl_float));
+  std::vector<cl_float> h_y(size*sizeof(cl_float));
+
+  
+  
+  //cl_float* h_x   = (float *)malloc(size*sizeof(cl_float));
+  //cl_float* h_y   = (float *)malloc(size*sizeof(cl_float));
   for(cl_uint i = 0; i < size; ++i)
   {
     h_x[i] = 1.0f;
@@ -48,9 +59,9 @@ int main()
 
     //Eigenschaften Abfragen
     cl_context_properties cprops[] = {
-      CL_CONTEXT_PLATFORM, (cl_context_properties)(platformList[0])(), 0};
+      CL_CONTEXT_PLATFORM, (cl_context_properties)(platformList[p])(), 0};
     
-    cl::Context context(CL_DEVICE_TYPE_GPU, cprops);
+    cl::Context context(CL_DEVICE_TYPE_ALL, cprops);
 
     //Zuordnung der Devices einer Platform
     std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
@@ -68,6 +79,8 @@ int main()
       CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, 
       size*sizeof(cl_float), 
       (void*)&h_x[0]);
+
+    //queue.enqueueMapBuffer(&d_x, CL_TRUE, NULL, 0, size*sizeof(cl_float));
 
     cl::Buffer d_y = cl::Buffer(
       context, 
@@ -90,13 +103,13 @@ int main()
     kernel.setArg(narg++, size);
     
     //ordnet context und device ine eine Warteschlange ein
-    cl::CommandQueue queue(context, devices[0]);
+    cl::CommandQueue queue(context, devices[d]);
 
     queue.enqueueNDRangeKernel(
       kernel, 
       cl::NullRange, 
-      cl::NDRange(size), 
-      cl::NDRange(256));
+      cl::NDRange(global_item_size), 
+      cl::NDRange(local_item_size));
  
     //Lesen des buffers
     cl_float *h_res = (cl_float*)queue.enqueueMapBuffer(
@@ -117,7 +130,7 @@ int main()
  
     //Destruktoren rufen...
   }
-  catch (cl::Error err)
+  catch (cl::Error const &err)
   {
     std::cerr << "ERROR: " << err.what() << " (" << err.err() << ")" << std::endl;
     return EXIT_FAILURE;

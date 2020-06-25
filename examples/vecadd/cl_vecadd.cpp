@@ -40,10 +40,6 @@ int main(int argc, char *argv[])
   std::vector<cl_float> h_x(size*sizeof(cl_float));
   std::vector<cl_float> h_y(size*sizeof(cl_float));
 
-  
-  
-  //cl_float* h_x   = (float *)malloc(size*sizeof(cl_float));
-  //cl_float* h_y   = (float *)malloc(size*sizeof(cl_float));
   for(cl_uint i = 0; i < size; ++i)
   {
     h_x[i] = 1.0f;
@@ -120,7 +116,7 @@ int main(int argc, char *argv[])
       size*sizeof(cl_float));
 
     //Ausgabe auf Host
-    for(cl_uint i = 0; i < size; ++i)
+    for(cl_uint i = 0; i < 5; ++i)
     {
       printf("element %d: %f\n", i, h_res[i]);
     }

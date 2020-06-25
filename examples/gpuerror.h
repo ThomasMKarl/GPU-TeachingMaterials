@@ -44,12 +44,16 @@ cudaError_t cudaDeviceTest();
 
 ///////////////////////////////////////////////////////////////////
 
-#define CL_TARGET_OPENCL_VERSION 220
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#else
-#include <CL/cl.h>
-#endif
+#define CL_TARGET_OPENCL_VERSION 200
+#define CL_HPP_TARGET_OPENCL_VERSION 200
+#define CL_HPP_ENABLE_EXCEPTIONS
+#include <CL/cl2.hpp>
+
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
 #ifdef DEBUG_OCL
 
 #define OCL_CALL(x) do { cl_int r = x ;if((r)!=CL_SUCCESS) { \

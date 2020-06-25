@@ -1,7 +1,7 @@
 /* simple magma example: create a vector and find maximum value */
 //compile: g++ -std=c++11 -O3 -Wall -Wextra -pedantic -fopenmp -o magma 
-// magma.cc 
-// -lmagma -lopenblas -lcublas -lcudart -DHAVE_CUBLAS
+// magma.cpp
+// -lmagma -lopenblas
   
 #include <stdlib.h>
 #include <stdio.h>

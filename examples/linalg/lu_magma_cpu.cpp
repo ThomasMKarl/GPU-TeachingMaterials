@@ -12,7 +12,7 @@ int main(void)
   magma_int_t  dev = 0;
   magma_queue_create(dev, &queue);
   
-  magma_int_t m = 8192;
+  magma_int_t m = 4;
   magma_int_t n = 1;
   magma_int_t mm = m*m;                      
   
@@ -20,14 +20,15 @@ int main(void)
   float *b;                          
   float *x;
   magma_int_t *piv;
-  magma_smalloc_pinned(&a, mm);   
+  magma_smalloc_pinned(&a, mm);
   magma_smalloc_pinned(&b, m);  
   magma_smalloc_pinned(&x, m);   
   piv=(magma_int_t *)malloc(m*sizeof(magma_int_t));
 
   magma_int_t ione = 1;         
   magma_int_t ISEED[4] = {0,0,0,1};
-  lapackf77_slarnv(&ione, ISEED, &mm, a);            
+  lapackf77_slarnv(&ione, ISEED, &mm, a);
+  //magma_sprint(16, 1, a, mm);         
   lapackf77_slarnv(&ione, ISEED, &m,  x);
   printf("upper  left  corner  of the  expected  solution :\n");
   magma_sprint(4, 1, x, m);
@@ -35,6 +36,7 @@ int main(void)
   const float alpha = 1.0f;
   const float beta = 0.0f;
   blasf77_sgemm("N", "N", &m, &n, &n, &alpha, a, &m, x, &m, &beta, b, &m);
+  //magma_sprint(4, 1, b, m);
   
   real_Double_t gpu_time = magma_sync_wtime(NULL);
   magma_int_t info;

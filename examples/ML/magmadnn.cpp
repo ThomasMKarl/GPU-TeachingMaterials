@@ -17,12 +17,12 @@ int main(int argc, char **argv)
     magmadnn_init();
 
     /* here we declare our variables for the simulation */
-    Tensor<float> *images_host, *labels_host;
+    Tensor<float> *images_host, *labels_host, *images_host_test, *labels_host_test, *labels_host_pred;
     uint32_t n_images, n_rows, n_cols, n_labels, n_classes = 10, n_features;
     memory_t training_memory_type;
 
-    images_host = read_mnist_images("/opt/data/mnist/train-images-idx3-ubyte", n_images, n_rows, n_cols);
-    labels_host = read_mnist_labels("/opt/data/mnist/train-labels-idx1-ubyte", n_labels, n_classes);
+    images_host = read_mnist_images("/home/thomas/Desktop/SSD/Workspace/data/ML/ML2/ex1/data/train-images.idx3-ubyte", n_images, n_rows, n_cols);
+    labels_host = read_mnist_labels("/home/thomas/Desktop/SSD/Workspace/data/ML/ML2/ex1/data/train-labels.idx1-ubyte", n_labels, n_classes);
     n_features = n_rows * n_cols;
     if(images_host == NULL || labels_host == NULL) return 1;
 
@@ -83,8 +83,17 @@ int main(int argc, char **argv)
         verbose: whether to print training info during training or not */
     model.fit(images_host, labels_host, metrics, true);
 
+    /* testing */
+    images_host_test = read_mnist_images("/home/thomas/Desktop/SSD/Workspace/data/ML/ML2/ex1/data/t10k-images.idx3-ubyte", n_images, n_rows, n_cols);
+    labels_host_test = read_mnist_labels("/home/thomas/Desktop/SSD/Workspace/data/ML/ML2/ex1/data/t10k-labels.idx1-ubyte", n_labels, n_classes);
+    if(images_host_test == NULL || labels_host_test == NULL) return 1;
+    
+    //model.predict(...);
+
     delete images_host;
     delete labels_host;
+    delete images_host_test;
+    delete labels_host_test;
     delete output;
     
     magmadnn_finalize();

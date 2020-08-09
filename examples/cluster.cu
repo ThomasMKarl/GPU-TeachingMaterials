@@ -33,7 +33,7 @@ int main(int argc, char** argv)
         printf("Host %s with rank %d (of %d) has %d device(s). Its device #%d is %s and has compute capability %d.%d.\n", processor_name, world_rank, world_size, deviceCount, device+1, deviceProp.name, deviceProp.major, deviceProp.minor);
     }
     
-    uint size = 100*BLOCK_SIZE*world_size;
+    uint size = 100*BLOCK_SIZE;
 
     double *v1  = (double*)malloc(size * sizeof(double));
     double *v2  = (double*)malloc(size * sizeof(double));
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
     cudaMemcpy(res, dres, size*sizeof(double), cudaMemcpyDeviceToHost);
    
     for(uint i = 0; i < size; ++i)
-      printf("number %d: %f * %f = %f\n", world_rank*size+i, v1[i], v2[i], res[i]);    
+      printf("number %d: %f * %f = %f\n", size+i, v1[i], v2[i], res[i]);    
 
     
     MPI_Finalize();

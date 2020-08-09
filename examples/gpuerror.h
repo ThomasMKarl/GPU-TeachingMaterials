@@ -37,6 +37,15 @@
     printf("Error at %s:%d\n",__FILE__,__LINE__);\
     return EXIT_FAILURE;}} while(0)
 
+#define NCCLCHECK(cmd) do {                         \
+  ncclResult_t r = cmd;                             \
+  if (r!= ncclSuccess) {                            \
+    printf("Failed, NCCL error %s:%d '%s'\n",       \
+        __FILE__,__LINE__,ncclGetErrorString(r));   \
+    exit(EXIT_FAILURE);                             \
+  }                                                 \
+} while(0)
+
 cudaError_t cudaDeviceTest();
 
 #endif
@@ -72,6 +81,7 @@ int oclKernelTest(int, cl_program, cl_device_id);
 #define CUFFT_CALL(x) do {x;} while(0)
 #define CUSOLVER_CALL(x) do {x;} while(0)
 #define CUDNN_CALL(x) do {x;} while(0)
+#define NCCLCHECK(x) do {x;} while(0)
 #endif
 
 #ifndef DEBUG_OCL

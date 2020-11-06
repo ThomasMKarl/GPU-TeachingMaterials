@@ -3,8 +3,8 @@
 
 int main(void)
 {
-  float error;
   float tol = 0.01;
+  float error = tol;
   int iter = 0;
   int iter_max = 1000;
 
@@ -18,8 +18,7 @@ int main(void)
   }
 
   #pragma omp target data map(alloc: Anew) map(A)
-  //while(error > tol && iter < iter_max)
-  while(iter < iter_max)
+  while(error >= tol && iter < iter_max)
   {
     error = 0.0f;
     #pragma omp target teams distribute parallel for reduction(max: error)

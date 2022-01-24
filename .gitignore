@@ -6,4 +6,4 @@ Kits
 *.log
 .vscode
 doc
-build/*
+build

@@ -1,11 +1,11 @@
 /* demonstrates usage of cuSPARSE library*/
 /* Creation of sparse matrices and vectors, examples for all three levels */
-//compile: nvcc -std=c++14 -O3 -o cusparse cusparse.cu -lcusparse -Xcompiler "-Wall -Wextra -std=c++14 -O3"
-
 #include<iostream>
+
 #include<cusparse.h>
 
-int main()
+
+int main(int argc, char *argv[])
 {
     /* --HOST-- */
     
@@ -65,7 +65,7 @@ int main()
     cudaMemcpy(cooColIndex, cooColIndexHostPtr,
                             (size_t)(nnz*sizeof(int)),           cudaMemcpyHostToDevice);
     cudaMemcpy(cooVal,      cooValHostPtr,
-	                    (size_t)(nnz*sizeof(double)),        cudaMemcpyHostToDevice);
+	                        (size_t)(nnz*sizeof(double)),        cudaMemcpyHostToDevice);
     cudaMemcpy(y,           yHostPtr,
                             (size_t)(2*n*sizeof(double)),        cudaMemcpyHostToDevice);
     cudaMemcpy(xInd,        xIndHostPtr,

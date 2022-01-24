@@ -1,6 +1,8 @@
-#include "hip/hip_runtime.h"
-/* CUDA example for the addition of two vectors */
+/* HIP example for the addition of two vectors */
 #include <stdio.h>
+
+#include "hip/hip_runtime.h"
+
 
 #define HIP_CALL(x) do { hipError_t err = x; if(err!=hipSuccess) { \
     printf("'%s' at %s:%d\n",hipGetErrorString(x),__FILE__,__LINE__); \
@@ -15,7 +17,7 @@ __global__ void VecAdd(float* A, float* B, float* C, int N)
 }
             
 // Host code
-int main()
+int main(int argc, char **argv)
 {
     int N = 12800;
     size_t size = N * sizeof(float);
@@ -29,7 +31,7 @@ int main()
     for(uint i = 0; i < N; ++i)
     {
         h_A[i] = i;
-	h_B[i] = 2.0*i;
+	    h_B[i] = 2.0*i;
     }
 
     // Allocate vectors in device memory
@@ -39,8 +41,6 @@ int main()
     HIP_CALL(hipMalloc(&d_B, size));
     float* d_C;
     HIP_CALL(hipMalloc(&d_C, size));
-
-    exit(-1);
 
     // Copy vectors from host memory to device memory
     hipMemcpy(d_A, h_A, size, hipMemcpyHostToDevice);

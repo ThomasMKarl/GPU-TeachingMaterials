@@ -2,7 +2,7 @@
 /* demonstrates usage of streams */
 #include<stdio.h>
 
-int main()
+int main(int argc, char **argv)
 {
   int *h_A, *h_B, *d_A, *d_B;
   

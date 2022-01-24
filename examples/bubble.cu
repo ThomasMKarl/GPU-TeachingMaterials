@@ -1,7 +1,12 @@
 /* implemantation of the bubble-sort algorithm in CUDA */
 #include <stdio.h>
 
-#define BLOCK_SIZE 192
+
+#ifdef _WIN32
+using uint = unsigned int;
+#endif
+
+#define BLOCK_SIZE 256
 
 uint bubblesort(float*, unsigned long long);
 cudaError_t cuda_bubblesort(float*, unsigned long long);
@@ -12,7 +17,7 @@ __global__ void bubble_kernel2(float*, unsigned long long, unsigned short int*);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int main()
+int main(int argc, char *argv[])
 {
   unsigned long long size = 3000;
   
@@ -54,9 +59,8 @@ uint bubblesort(float *h_array, unsigned long long size)
     {
       if(h_array[i] > h_array[i+1])
       {
-	swap(h_array[i], h_array[i+1]);
-
-	newn = i+1;
+	      swap(h_array[i], h_array[i+1]);
+	      newn = i+1;
       }
     }
     
@@ -116,7 +120,7 @@ cudaError_t cuda_bubblesort(float *h_array, unsigned long long size)
 
   error = cudaFree(d_array);
   
-  printf("sorted after %d steps.\n", counter);
+  printf("sorted after %lld steps.\n", counter);
 	     
   return error;
 }

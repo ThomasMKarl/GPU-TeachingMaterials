@@ -1,8 +1,13 @@
 /* CUDA example for the addition of two vectors */
 #include <stdio.h>
 
+
+#ifdef _WIN32
+using uint = unsigned int;
+#endif
+
 // Device code
-__global__ void VecAdd(float* A, float* B, float* C, int N)
+__global__ void VecAdd(float* A, float* B, float* C, uint N)
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
     if (i < N)
@@ -10,10 +15,10 @@ __global__ void VecAdd(float* A, float* B, float* C, int N)
 }
             
 // Host code
-int main()
+int main(int argc, char **argv)
 {
-    int N = 12800;
-    size_t size = N * sizeof(float);
+    uint N = 12800;
+    uint size = N * sizeof(float);
 
     // Allocate vectors in device memory
     float* A;
@@ -27,12 +32,12 @@ int main()
     for(uint i = 0; i < N; ++i)
     {
         A[i] = i;
-	B[i] = 2.0*i;
+        B[i] = 2.0*i;
     }
 
     // Invoke kernel
-    int threadsPerBlock = 256;
-    int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
+    uint threadsPerBlock = 256;
+    uint blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
     
     VecAdd<<<blocksPerGrid, threadsPerBlock>>>(A, B, C, N);
 

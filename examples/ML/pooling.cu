@@ -32,7 +32,7 @@ dtype gradient[IN_SIZE] = {0.000000f,0.000000f,0.073700f,0.000000f,2.388026f,0.0
     } \
   } 
 
-int main(void)
+int main()
 {
   cudnnHandle_t cudnn;
   checkCUDNN(cudnnCreate(&cudnn));

@@ -1,8 +1,8 @@
 /* provides some additional functions for error handling */
-//compile as shared library
 //with -DDEBUG_CUDA for CUDA   error handling only
 //with -DDEBUG_OCL  for OpenCL error handling only
 #include "gpuerror.h"
+
 
 #ifdef DEBUG_CUDA
 cudaError_t cudaDeviceTest()
@@ -30,29 +30,29 @@ cudaError_t cudaDeviceTest()
            prop.memoryBusWidth);
     printf("Peak Memory Bandwidth (GB/s): %f\n",
            2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6);
-    printf("Shared Memory: %d\n",
+    printf("Shared Memory: %zd\n",
            prop.sharedMemPerBlock);
-    printf("Global Memory: %d\n",
+    printf("Global Memory: %zd\n",
            prop.totalGlobalMem);
     printf("Registers per Block: %d\n",
            prop.regsPerBlock);
     printf("Warpsize: %d\n",
            prop.warpSize);
-    printf("Memory Pitch: %d\n",
+    printf("Memory Pitch: %zd\n",
            prop.memPitch);
     printf("Threads per Block: %d\n",
            prop.maxThreadsPerBlock);
     printf("Thread Dimensions: %d %d %d\n",
            prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
-    printf("Grid Dimensions: %d\n",
+    printf("Grid Dimensions: %d, %d, %d\n",
            prop.maxGridSize[0], prop.maxGridSize[1], prop.maxGridSize[2]);
-    printf("Constant Memory: %d\n",
+    printf("Constant Memory: %zd\n",
            prop.totalConstMem);       
     printf("Major Revision Number: %d\n",
           prop.major);        
     printf("Minor Revision Number: %d\n",
           prop.minor);        
-    printf("Alignment Requirement: %d\n",
+    printf("Alignment Requirement: %zd\n",
           prop.textureAlignment);
     printf("Device Overlap: %d\n",
           prop.deviceOverlap);       
@@ -313,12 +313,16 @@ int oclKernelTest(int error, cl_program program, cl_device_id device_id)
 }
 #endif
 
+#ifndef DEBUG_CUDA
+cudaError_t cudaDeviceTest() {return cudaSuccess;};
+#endif
+
 #ifndef DEBUG_OCL
   const char *oclGenErrorString(int error){return "";}
   int oclKernelTest(int error, cl_program program, cl_device_id device_id){return 0;} 
 #endif
 
-/*int oclReadFile(char *path, char *source_str, size_t *source_size) 
+int oclReadFile(char *path, char *source_str, size_t *source_size) 
 {
   FILE *fp;
   fp = fopen(path, "r");
@@ -338,4 +342,4 @@ int oclKernelTest(int error, cl_program program, cl_device_id device_id)
   fclose(fp);
   
   return EXIT_SUCCESS;
-  }*/
+}

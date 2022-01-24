@@ -1,4 +1,3 @@
-//icc mkl_fft.c -mkl -tbb -fPIE -cxxlib-nostd -no-cxxlib -c
 #include "mkl_fft.h"
   
 MKL_LONG mkl_test(float *X, size_t N)

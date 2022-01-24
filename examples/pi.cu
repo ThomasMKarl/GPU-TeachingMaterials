@@ -1,11 +1,12 @@
 /* Using THRUST functors and cuRAND to estimate pi via Monte-Carlo integration */
+#include <iostream>
+#include <iomanip>
+
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/functional.h>
 #include <thrust/transform_reduce.h>
 #include <curand_kernel.h>
 
-#include <iostream>
-#include <iomanip>
 
 // we could vary M & N to find the perf sweet spot
 
@@ -48,7 +49,7 @@ struct estimate_pi :
   }
 };
 
-int main()
+int main(int argc, char **argv)
 {
   // use 30K independent seeds
   int M = 30000;

@@ -1,6 +1,14 @@
 /* Comparison of a normal vector addition with an asynchronous one, the latter is divided in smaller memory batches */
 #include<stdio.h>
-#include<gpuerror.h>
+
+
+#ifdef _WIN32
+using uint = unsigned int;
+#endif
+
+#define CUDA_CALL(x) do { cudaError_t err = x; if(err!=cudaSuccess) { \
+    printf("'%s' at %s:%d\n",cudaGetErrorString(x),__FILE__,__LINE__); \
+    return EXIT_FAILURE;}} while(0)
 
 ////////////////////////////////////////////////////////////////
 
@@ -8,10 +16,8 @@ int VecAdd      (float*, float*, float*, uint);
 int VecAddAsync (float*, float*, float*, uint);
 __global__ void cuVecAdd(float*, float*, float*, uint);
   
-int main()
+int main(int argc, char **argv)
 {
-  cudaDeviceTest();
-  
   uint N = 1280000;
   uint size = N*sizeof(float);
   
@@ -25,8 +31,11 @@ int main()
     h_B[i] = 2.0f;
   }
 
-  CUDA_CALL(VecAdd(h_A, h_B, h_C, N));
-  CUDA_CALL(VecAddAsync(h_A, h_B, h_C, N));
+  if(!VecAdd(h_A, h_B, h_C, N))
+    return EXIT_FAILURE;
+  if(!VecAddAsync(h_A, h_B, h_C, N))
+    return EXIT_FAILURE;
+
   for(uint i = 0; i < 1; ++i) printf("%f\n", h_C[12345]);
 
   CUDA_CALL(cudaFreeHost(h_A));

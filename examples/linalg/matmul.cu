@@ -3,6 +3,7 @@
 /* demonstrates multi-dimensional blocks */
 #include<stdio.h>
 
+
 // Matrices are stored in row-major order:
 // M(row, col) = *(M.elements + row * M.width + col)
 typedef struct
@@ -163,7 +164,7 @@ void MatMulKernelShared(const Matrix A, const Matrix B, Matrix C)
     SetElement(Csub, row, col, Cvalue);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     cudaEvent_t start, stop;
     cudaEventCreate(&start);

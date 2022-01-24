@@ -1,12 +1,17 @@
 /* Demonstration of multi-device reductions with NCCL */
-//compile: nvcc -O3 -std=c++14 -o nccl nccl.cu -lnccl
 #include <stdio.h>
+
 #include <nccl.h>
+
+
+#ifdef _WIN32
+using uint = unsigned int;
+#endif
 
 #define CUDACHECK(cmd) do {                         \
   cudaError_t e = cmd;                              \
   if( e != cudaSuccess ) {                          \
-    printf("Failed: Cuda error %s:%d '%s'\n",             \
+    printf("Failed: Cuda error %s:%d '%s'\n",       \
         __FILE__,__LINE__,cudaGetErrorString(e));   \
     exit(EXIT_FAILURE);                             \
   }                                                 \
@@ -16,7 +21,7 @@
 #define NCCLCHECK(cmd) do {                         \
   ncclResult_t r = cmd;                             \
   if (r!= ncclSuccess) {                            \
-    printf("Failed, NCCL error %s:%d '%s'\n",             \
+    printf("Failed, NCCL error %s:%d '%s'\n",       \
         __FILE__,__LINE__,ncclGetErrorString(r));   \
     exit(EXIT_FAILURE);                             \
   }                                                 \

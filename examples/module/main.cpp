@@ -4,9 +4,8 @@
 
 #include "module.h" //include some gpu code
 
-//compile with g++ and link with -lmodule and -lcudart 
 
-int main()
+int main(int argc, char **argv)
 {
   float *d_A;
   CUDA_CALL(cudaMalloc(&d_A, sizeof(float)));

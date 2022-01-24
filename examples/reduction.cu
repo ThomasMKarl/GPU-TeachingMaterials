@@ -1,6 +1,11 @@
 /* implementation of a max-reduction with five levels of optimization */
 #include<stdio.h>
 
+
+#ifdef _WIN32
+using uint = unsigned int;
+#endif
+
 __global__ void PR_v1(int *d)
 {
   uint tid = threadIdx.x;

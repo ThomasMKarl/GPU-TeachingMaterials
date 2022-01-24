@@ -1,13 +1,18 @@
 /* a demonstration of the usage of cuRAND (host and device API)*/
 #include<stdio.h>
 #include<time.h>
+
 #include<curand.h>
 #include<curand_kernel.h>
+
+
+#ifdef _WIN32
+using uint = unsigned int;
+#endif
 
 #define CURAND_CALL(x) do { if((x)!=CURAND_STATUS_SUCCESS) { \
     printf("Error at %s:%d\n",__FILE__,__LINE__);\
     return EXIT_FAILURE;}} while(0)
-
 
 __global__
 void setup_kernel(curandState *state, uint n)
@@ -34,7 +39,7 @@ void generate_kernel(curandState *state, float *result, uint n)
 }
 
 
-int main()
+int main(int argc, char **argv)
 {
     size_t n = 10;
     uint block_size = 128;

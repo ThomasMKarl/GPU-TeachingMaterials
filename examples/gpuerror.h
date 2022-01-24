@@ -4,10 +4,10 @@
 
 #include<stdio.h>
 
-#ifdef DEBUG_CUDA
-
 #include<cuda.h>
 #include<cuda_runtime.h>
+
+#ifdef DEBUG_CUDA
 
 #define CUDA_CALL(x) do { cudaError_t err = x; if(err!=cudaSuccess) { \
     printf("'%s' at %s:%d\n",cudaGetErrorString(x),__FILE__,__LINE__); \
@@ -25,7 +25,7 @@
     printf("Error at %s:%d\n",__FILE__,__LINE__);\
     return EXIT_FAILURE;}} while(0)
 
-#define CUFFT_CALL(x) do { if((x)!=CUFFT_STATUS_SUCCESS) {	\
+#define CUFFT_CALL(x) do { if((x)!=CUFFT_SUCCESS) {	\
     printf("Error at %s:%d\n",__FILE__,__LINE__);\
     return EXIT_FAILURE;}} while(0)
 
@@ -56,7 +56,7 @@ cudaError_t cudaDeviceTest();
 #define CL_TARGET_OPENCL_VERSION 200
 #define CL_HPP_TARGET_OPENCL_VERSION 200
 #define CL_HPP_ENABLE_EXCEPTIONS
-#include <CL/cl2.hpp>
+#include <CL/opencl.hpp>
 
 #include <string>
 #include <iostream>
@@ -82,6 +82,7 @@ int oclKernelTest(int, cl_program, cl_device_id);
 #define CUSOLVER_CALL(x) do {x;} while(0)
 #define CUDNN_CALL(x) do {x;} while(0)
 #define NCCLCHECK(x) do {x;} while(0)
+cudaError_t cudaDeviceTest();
 #endif
 
 #ifndef DEBUG_OCL

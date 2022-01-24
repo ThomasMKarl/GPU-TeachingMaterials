@@ -3,3 +3,7 @@ libdoc.pdf
 *~
 *#
 Kits
+*.log
+.vscode
+doc
+build/*

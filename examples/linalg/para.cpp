@@ -1,7 +1,9 @@
 /* Solving the stationary heat equation iteratively (2d Laplace stencil) with PARALUTION */
 #include<iostream>
 #include<cstdlib>
+
 #include<paralution.hpp>
+
 
 using namespace paralution;
 

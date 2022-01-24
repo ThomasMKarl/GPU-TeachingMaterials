@@ -167,6 +167,7 @@ vadd_hip:
 	$(HCC) $(CXX_FLAGS) vecadd/vecadd.hip.cu -o build/vecadd/vecadd_hip
 
 vadd_cl:
+	cp vecadd/cl_vecadd.cl build/vecadd/cl_vecadd.cl
 	$(CC) $(C_FLAGS) vecadd/cl_vecadd.c -o build/vecadd/vecadd_cl -I $(OCL_INCLUDE) -L $(OCL_LIB) -lOpenCL
 
 vadd_clcpp:
